@@ -1,2 +1,3 @@
-# restaurant
-Restaurant simulator
+# Restaurant Simulator
+
+Event-driven restaurant simulator application.
