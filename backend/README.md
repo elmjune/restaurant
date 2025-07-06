@@ -20,3 +20,8 @@ Run the server:
 python3 kitchen/main.py
 ```
 
+Run all unit tests:
+```bash
+python3 -m unittest discover kitchen
+```
+

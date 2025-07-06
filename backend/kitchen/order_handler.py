@@ -25,7 +25,7 @@ class OrderHandler:
         Create a new `OrderHandler` instance with the given parameters.
 
         Args:
-            client: The MQTT client that should be used for all communications
+            client: The `MQTTClient` that should be used for all communications
             broker_url: the connection URI to the MQTT broker
             min_wait: the minimum amount of random wait time
             max_wait: the maximum amount of random wait time
@@ -37,7 +37,7 @@ class OrderHandler:
 
     async def connect(self):
         """
-        Connect to the MQTT broker.
+        Connect to the MQTT broker and subscribe to the appropriate topics.
 
         Raises:
             ConnectError: if a connection to the broker could not be established.
@@ -51,19 +51,33 @@ class OrderHandler:
         logger.info("Listening for orders...")
         async with TaskGroup() as group:
             while True:
-                await self.listen_for_order(group)
+                try:
+                    await self.listen_for_order(group)
+                except Exception as e:
+                    logger.error(e)
+                    break
+
+        await self.close()
 
     async def listen_for_order(self, group: TaskGroup):
         """
         Waits for the next restaurant order and creates a new Task to handle it.
-        If an error occurs while waiting, it logs and returns.
+        If an error occurs while listening, it logs and returns.
 
         Args:
             group: the `TaskGroup` that should receive the new `Task` when an order is received.
         """
         try:
             message = await self.client.deliver_message()
+            if not message:
+                return logger.error("Failed to retrieve next message")
+
             packet = message.publish_packet
+            if not packet:
+                return logger.error(
+                    "Failed to retrieve publish packet from order message"
+                )
+
             logger.info(
                 f"Received packet {packet.packet_id}: {packet.topic_name} -> {packet.data}"
             )
@@ -91,3 +105,8 @@ class OrderHandler:
 
         await self.client.publish("restaurant/deliver", payload_bytes, qos=QOS_2)
         logger.info(f"Delivered order for packet {packet.packet_id}.")
+
+    async def close(self):
+        """Close the connection to the broker."""
+        await self.client.unsubscribe(["restaurant/order"])
+        await self.client.disconnect()
