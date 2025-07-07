@@ -17,6 +17,7 @@
 		<Table tableNumber={tableNumber + 1} />
 	{/each}
 </div>
+<p style="margin-left: 1em;">Waiting time: 3 to 9 seconds</p>
 
 <style>
 	:global(body) {
