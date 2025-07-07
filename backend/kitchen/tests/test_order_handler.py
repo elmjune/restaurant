@@ -75,8 +75,6 @@ class OrderHandlerTest(unittest.IsolatedAsyncioTestCase):
         if packet is None or packet.publish_packet is None:
             self.fail("a packet was not received")
 
-        print(packet.topic)
-
         self.assertEqual(packet.topic, "restaurant/deliver")
         if packet.publish_packet.payload is None:
             self.fail("packet payload was not found")
