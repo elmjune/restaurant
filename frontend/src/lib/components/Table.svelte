@@ -11,6 +11,8 @@ A component representing a single table at the restaurant.
 	/** The unique number for this table */
 	let { tableNumber }: { tableNumber: number } = $props();
 
+	let dialog: Dialog;
+
 	const foods = $derived.by(() => {
 		const orders = receivedOrders[tableNumber] ?? [];
 		return orders.map((o) => o.food);
@@ -20,16 +22,23 @@ A component representing a single table at the restaurant.
 	 * Create a new `Order` and request it be delivered.
 	 * @param foodName the name of the new order's food
 	 */
-	async function orderFood(foodName: string) {
-		const order = { table: tableNumber, food: foodName };
+	async function orderFood(tableNum: number, foodName: string) {
+		const order = { table: tableNum, food: foodName };
 		await foodHandler.sendOrder(order);
+	}
+
+	/**
+	 * Show a modal dialog for retrieving information about a new order.
+	 */
+	function showDialog() {
+		dialog.show();
 	}
 </script>
 
 <div id="table-container">
 	<div class="table-header">
 		<h2>Table {tableNumber}</h2>
-		<button id="order-button" onclick={async () => await orderFood('food')}> Order </button>
+		<button id="order-button" onclick={showDialog}> Order </button>
 	</div>
 	<div id="food-list">
 		{#if foods.length == 0}
@@ -41,9 +50,9 @@ A component representing a single table at the restaurant.
 			</p>
 		{/each}
 	</div>
-</div>
 
-<Dialog />
+	<Dialog bind:this={dialog} onSubmit={(food) => orderFood(tableNumber, food)} />
+</div>
 
 <style>
 	#table-container {

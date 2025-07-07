@@ -1,7 +1,50 @@
+<!-- 
+@component
+Component for showing a modal dialog that takes in user input.
+Use the `onSubmit` prop to get the value back if the user submits the form.
+-->
 <script lang="ts">
+	let { onSubmit }: { onSubmit: (text: string) => void } = $props();
 
+	let value = $state('');
+	let dialog: HTMLDialogElement | undefined;
+
+	export function show() {
+		dialog?.showModal();
+	}
+
+	function reset() {
+		value = '';
+	}
+
+	function submit() {
+		const val = $state.snapshot(value);
+		dialog?.close();
+		onSubmit(val);
+	}
 </script>
 
-<dialog>
-    <p>hello</p>
+<dialog bind:this={dialog} onclose={reset}>
+	<div class="dialog-form">
+		<h2>Order food</h2>
+		<p>Enter the name of the food you would like:</p>
+		<input id="food-input" type="text" bind:value />
+		<div class="form-buttons">
+			<button onclick={submit}>Order</button>
+			<button onclick={() => dialog?.close()}>Cancel</button>
+		</div>
+	</div>
 </dialog>
+
+<style>
+	.form-buttons {
+		display: flex;
+		margin-top: 1em;
+		gap: 0.5rem;
+	}
+
+	#food-input {
+		width: 100%;
+	}
+</style>
+
