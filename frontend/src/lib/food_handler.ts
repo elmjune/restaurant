@@ -68,17 +68,17 @@ export class FoodHandler {
 }
 
 /**
- * Create a new `FoodHandler` with a new MQTT client.
+ * Create a new `FoodHandler` with a new MQTT client, and subscribe to the proper topics.
  */
-async function createFoodHandler(): Promise<FoodHandler> {
+export async function createFoodHandler(): Promise<FoodHandler> {
     const client = await mqtt.connectAsync(PUBLIC_MQTT_BROKER_URL);
-    return new FoodHandler(client, receivedOrders)
-}
-
-export let foodHandler: FoodHandler;
-try {
-    foodHandler = await createFoodHandler()
-    await foodHandler.subscribe()
-} catch (e) {
-    console.error("Failed to initialize MQTT food handler: ", e);
+    let foodHandler: FoodHandler
+    try {
+        foodHandler = new FoodHandler(client, receivedOrders)
+        await foodHandler.subscribe()
+    } catch (e) {
+        console.error(e)
+        return Promise.reject("Failed to initialize MQTT food handler")
+    }
+    return foodHandler
 }

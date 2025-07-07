@@ -4,10 +4,8 @@ A component representing a single table at the restaurant.
 -->
 
 <script lang="ts">
-	import { receivedOrders } from '$lib/state.svelte';
-	import { getContext } from 'svelte';
+	import { getFoodHandlerContext, receivedOrders } from '$lib/state.svelte';
 	import Dialog from './Dialog.svelte';
-	import type { FoodHandler } from '$lib/food_handler';
 
 	/** The unique number for this table */
 	let { tableNumber }: { tableNumber: number } = $props();
@@ -18,7 +16,7 @@ A component representing a single table at the restaurant.
 	/** Whether to show the 'order sent' confirmation message */
 	let showConfirmationMessage = $state(false);
 
-	const foodHandler: FoodHandler = getContext('food-handler');
+	const getFoodHandler = getFoodHandlerContext();
 
 	let dialog: Dialog;
 
@@ -33,7 +31,7 @@ A component representing a single table at the restaurant.
 	 */
 	async function orderFood(tableNum: number, foodName: string) {
 		const order = { table: tableNum, food: foodName };
-		await foodHandler.sendOrder(order);
+		await getFoodHandler()?.sendOrder(order);
 		sentOrders += 1;
 	}
 

@@ -1,13 +1,19 @@
 <script lang="ts">
 	import Table from '$lib/components/Table.svelte';
-	import { foodHandler } from '$lib/food_handler';
-	import { TABLE_COUNT } from '$lib/state.svelte';
-	import { onDestroy, setContext } from 'svelte';
+	import { FoodHandler, createFoodHandler } from '$lib/food_handler';
+	import { setFoodHandlerContext, TABLE_COUNT } from '$lib/state.svelte';
+	import { onDestroy, onMount } from 'svelte';
 
-	setContext('food-handler', foodHandler);
+	let foodHandler: FoodHandler | undefined;
+
+	setFoodHandlerContext(() => foodHandler);
+
+	onMount(async () => {
+		foodHandler = await createFoodHandler();
+	});
 
 	onDestroy(async () => {
-		await foodHandler?.close();
+		foodHandler?.close();
 	});
 </script>
 
