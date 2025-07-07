@@ -18,8 +18,8 @@ class OrderHandler:
         self,
         client: MQTTClient,
         broker_url: str,
-        min_wait: float = 5,
-        max_wait: float = 10,
+        min_wait: float = 2,
+        max_wait: float = 8,
     ):
         """
         Create a new `OrderHandler` instance with the given parameters.
@@ -78,9 +78,7 @@ class OrderHandler:
                     "Failed to retrieve publish packet from order message"
                 )
 
-            logger.info(
-                f"Received packet {packet.packet_id}: {packet.topic_name} -> {packet.data}"
-            )
+            logger.info(f"Received packet {packet.topic_name} -> {packet.data}")
             group.create_task(self.handle_order(packet))
         except ClientError as e:
             logger.error(f"Error while handling message: {e}")
@@ -95,16 +93,14 @@ class OrderHandler:
 
         payload_bytes = packet.data
         if not payload_bytes:
-            return logger.error(
-                f"Failed to retrieve payload for packet {packet.packet_id}."
-            )
+            return logger.error(f"Failed to retrieve payload for packet.")
 
         # wait for a random amount of time (simulate work)
-        logger.info(f"Preparing order for packet {packet.packet_id}")
+        logger.info(f"Preparing order for packet {packet.topic_name} -> {packet.data}")
         await asyncio.sleep(random.uniform(self.min_wait, self.max_wait))
 
         await self.client.publish("restaurant/deliver", payload_bytes, qos=QOS_2)
-        logger.info(f"Delivered order for packet {packet.packet_id}.")
+        logger.info(f"Delivered order for packet {packet.topic_name} -> {packet.data}.")
 
     async def close(self):
         """Close the connection to the broker."""

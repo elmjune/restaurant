@@ -31,8 +31,8 @@ async def main():
         return logger.error(f"Fatal error while retrieving broker url: {e}")
 
     client = MQTTClient()
-    min_wait = float(os.getenv("MIN_ORDER_WAIT_SECS", "5"))
-    max_wait = float(os.getenv("MAX_ORDER_WAIT_SECS", "10"))
+    min_wait = float(os.getenv("MIN_ORDER_WAIT_SECS", "2"))
+    max_wait = float(os.getenv("MAX_ORDER_WAIT_SECS", "8"))
 
     order_handler = OrderHandler(client, broker_url, min_wait, max_wait)
 
