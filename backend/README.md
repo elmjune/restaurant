@@ -15,6 +15,12 @@ Install the dependencies:
 pip3 install -r requirements.txt
 ```
 
+Setup the environment variables:
+```bash
+cp .env.example .env
+vim .env # fill in the missing environment vars
+```
+
 Run the server:
 ```bash
 python3 kitchen/main.py

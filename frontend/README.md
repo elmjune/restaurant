@@ -10,6 +10,12 @@ Install the dependencies:
 npm install
 ```
 
+Setup the environment variables:
+```bash
+cp .env.example .env
+vim .env # fill in the missing environment vars
+```
+
 Run development environment:
 
 ```bash
