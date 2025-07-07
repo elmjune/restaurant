@@ -59,7 +59,7 @@ class OrderHandler:
 
         await self.close()
 
-    async def listen_for_order(self, group: TaskGroup):
+    async def listen_for_order(self, group: TaskGroup, timeout=None):
         """
         Waits for the next restaurant order and creates a new Task to handle it.
         If an error occurs while listening, it logs and returns.
@@ -68,7 +68,7 @@ class OrderHandler:
             group: the `TaskGroup` that should receive the new `Task` when an order is received.
         """
         try:
-            message = await self.client.deliver_message()
+            message = await self.client.deliver_message(timeout_duration=timeout)
             if not message:
                 return logger.error("Failed to retrieve next message")
 
