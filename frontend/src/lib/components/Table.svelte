@@ -11,6 +11,10 @@ A component representing a single table at the restaurant.
 	/** The unique number for this table */
 	let { tableNumber }: { tableNumber: number } = $props();
 
+	/** The number of orders sent so far*/
+	let sentOrders = $state(0);
+	let showConfirmationMessage = $state(false);
+
 	let dialog: Dialog;
 
 	const foods = $derived.by(() => {
@@ -25,6 +29,7 @@ A component representing a single table at the restaurant.
 	async function orderFood(tableNum: number, foodName: string) {
 		const order = { table: tableNum, food: foodName };
 		await foodHandler.sendOrder(order);
+		sentOrders += 1;
 	}
 
 	/**
@@ -33,9 +38,18 @@ A component representing a single table at the restaurant.
 	function showDialog() {
 		dialog.show();
 	}
+
+	$effect(() => {
+		if (sentOrders > 0) {
+			showConfirmationMessage = true;
+			setTimeout(() => {
+				showConfirmationMessage = false;
+			}, 1500);
+		}
+	});
 </script>
 
-<div id="table-container">
+<div id="table-container" data-testid="table-component">
 	<div class="table-header">
 		<h2>Table {tableNumber}</h2>
 		<button id="order-button" onclick={showDialog}> Order </button>
@@ -50,6 +64,12 @@ A component representing a single table at the restaurant.
 			</p>
 		{/each}
 	</div>
+
+	{#if showConfirmationMessage}
+		<p class="confirmation-message">Order sent</p>
+	{:else}
+		<p class="confirmation-message"></p>
+	{/if}
 
 	<Dialog bind:this={dialog} onSubmit={(food) => orderFood(tableNumber, food)} />
 </div>
@@ -86,5 +106,11 @@ A component representing a single table at the restaurant.
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+	}
+
+	.confirmation-message {
+		color: green;
+		font-weight: bold;
+		height: 0.1em;
 	}
 </style>

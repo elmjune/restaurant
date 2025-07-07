@@ -31,7 +31,7 @@ export class FoodHandler {
      */
     async sendOrder(order: Order) {
         const msg = JSON.stringify(order);
-        await this.client.publishAsync("restaurant/order", msg);
+        await this.client.publishAsync("restaurant/order", msg, { qos: 2 });
     }
 
     /**

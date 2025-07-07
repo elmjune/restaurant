@@ -1,9 +1,8 @@
 <script>
 	import Table from '$lib/components/Table.svelte';
 	import { foodHandler } from '$lib/food_handler';
+	import { TABLE_COUNT } from '$lib/state.svelte';
 	import { onDestroy } from 'svelte';
-
-	const TABLE_COUNT = 4;
 
 	onDestroy(async () => {
 		await foodHandler.close();
