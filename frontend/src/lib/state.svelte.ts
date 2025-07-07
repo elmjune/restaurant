@@ -1,5 +1,5 @@
-import { type Order } from "./types";
+import { type ReceivedOrders } from "./types";
 
 export const TABLE_COUNT = 4
 
-export const receivedOrders: { [tableNumber: number]: Array<Order> } = $state({})
+export const receivedOrders: ReceivedOrders = $state({})

@@ -1,11 +1,13 @@
-<script>
+<script lang="ts">
 	import Table from '$lib/components/Table.svelte';
 	import { foodHandler } from '$lib/food_handler';
 	import { TABLE_COUNT } from '$lib/state.svelte';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, setContext } from 'svelte';
+
+	setContext('food-handler', foodHandler);
 
 	onDestroy(async () => {
-		await foodHandler.close();
+		await foodHandler?.close();
 	});
 </script>
 

@@ -1,21 +1,25 @@
 import mqtt from "mqtt"
 import { receivedOrders } from "./state.svelte"
 import { PUBLIC_MQTT_BROKER_URL } from "$env/static/public"
-import type { Order } from "./types"
+import type { Order, ReceivedOrders } from "./types"
 
 /**
  * A class for publishing food orders and handling their deliveries.
  */
 export class FoodHandler {
     client: mqtt.MqttClient;
+    received: ReceivedOrders;
 
     /**
      * Create a new `FoodHandler` instance.
      * @param client the MQTT.js client to use for broker communications.
+     * @param the `ReceivedOrders` object in which all received orders will be put
      */
-    constructor(client: mqtt.MqttClient) {
+    constructor(client: mqtt.MqttClient, received: ReceivedOrders = {}) {
         this.client = client
+        this.onMessageReceive = this.onMessageReceive.bind(this)
         this.client.on('message', this.onMessageReceive);
+        this.received = received
     }
 
     /**
@@ -55,10 +59,10 @@ export class FoodHandler {
             console.error("Failed to parse order: ", e);
             return;
         }
-        if (order.table in receivedOrders) {
-            receivedOrders[order.table].push(order);
+        if (order.table in this.received) {
+            this.received[order.table].push(order);
         } else {
-            receivedOrders[order.table] = [order];
+            this.received[order.table] = [order];
         }
     }
 }
@@ -68,7 +72,7 @@ export class FoodHandler {
  */
 async function createFoodHandler(): Promise<FoodHandler> {
     const client = await mqtt.connectAsync(PUBLIC_MQTT_BROKER_URL);
-    return new FoodHandler(client)
+    return new FoodHandler(client, receivedOrders)
 }
 
 export let foodHandler: FoodHandler;
